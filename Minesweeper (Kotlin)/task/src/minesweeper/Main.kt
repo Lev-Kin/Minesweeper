@@ -1,33 +1,38 @@
 package minesweeper
 
-import kotlin.random.Random
+import java.util.*
 
 fun main() {
-    val rand = Random(System.currentTimeMillis())
-    val field = StringBuilder(
-        """
-        .........
-        .........
-        .........
-        .........
-        .........
-        .........
-        .........
-        .........
-        .........
-    """.trimIndent()
-    )
+    val map = mutableListOf<MutableList<Char>>()
+    repeat(9) { map.add(MutableList(9) { _ -> '.' }) }
 
-    print("How many mines do you want on the field?")
-    var mineCount = readln().toInt()
+    val sc = Scanner(System.`in`)
+    print("How many mines do you want on the field? ")
+    val mineCnt = sc.nextInt()
 
-    while (mineCount > 0) {
-        val minePosition = rand.nextInt(80)
-        if (field[minePosition] == '.') {
-            field[minePosition] = 'X'
-            mineCount--
+    mining(map, mineCnt)
+
+    for (mutableList in map) {
+        for (c in mutableList) {
+            print(c)
+        }
+        println()
+    }
+}
+
+private fun hintMine(map: MutableList<MutableList<Char>>, x: Int, y: Int) {
+    for (i in x - 1..x + 1) {
+        for (j in y - 1..y + 1) {
+            if (i in 0..8 && j in 0..8 && map[i][j] != 'X') {
+                map[i][j] = if (map[i][j] == '.') '1' else map[i][j] + 1
+            }
         }
     }
+}
 
-    println(field)
+private fun mining(map: MutableList<MutableList<Char>>, mineCnt: Int) {
+    (0..80).toList().shuffled().take(mineCnt).forEach {
+        map[it / 9][it % 9] = 'X'
+        hintMine(map, it / 9, it % 9)
+    }
 }
