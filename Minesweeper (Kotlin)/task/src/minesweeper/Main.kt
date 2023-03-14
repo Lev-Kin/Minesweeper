@@ -2,6 +2,8 @@ package minesweeper
 
 import java.util.*
 
+private val mines = mutableSetOf<Pair<Int, Int>>()
+
 fun main() {
     val map = mutableListOf<MutableList<Char>>()
     repeat(9) { map.add(MutableList(9) { _ -> '.' }) }
@@ -9,15 +11,44 @@ fun main() {
     val sc = Scanner(System.`in`)
     print("How many mines do you want on the field? ")
     val mineCnt = sc.nextInt()
+    val chkSet = mutableSetOf<Pair<Int, Int>>()
 
     mining(map, mineCnt)
+    hideMine(map)
+    printMap(map)
 
-    for (mutableList in map) {
-        for (c in mutableList) {
-            print(c)
+    while (chkSet != mines) {
+        print("Set/delete mines marks (x and y coordinates): ")
+        val x = sc.nextInt() - 1
+        val y = sc.nextInt() - 1
+
+        if (map[y][x] in '0'..'9') {
+            println("There is a number here!")
+        } else {
+            map[y][x] = if (map[y][x] == '*') {
+                chkSet.remove(y to x)
+                '.'
+            } else {
+                chkSet.add(y to x)
+                '*'
+            }
+            printMap(map)
         }
-        println()
     }
+    println("Congratulations! You found all the mines!")
+}
+
+private fun printMap(map: MutableList<MutableList<Char>>) {
+    println(" |123456789|")
+    println("-|---------|")
+    for ((i, list) in map.withIndex()) {
+        println(list.joinToString(separator = "", prefix = "${i + 1}|", postfix = "|"))
+    }
+    println("-|---------|")
+}
+
+private fun hideMine(map: MutableList<MutableList<Char>>) {
+    mines.forEach { (x, y) -> map[x][y] = '.' }
 }
 
 private fun hintMine(map: MutableList<MutableList<Char>>, x: Int, y: Int) {
@@ -34,5 +65,6 @@ private fun mining(map: MutableList<MutableList<Char>>, mineCnt: Int) {
     (0..80).toList().shuffled().take(mineCnt).forEach {
         map[it / 9][it % 9] = 'X'
         hintMine(map, it / 9, it % 9)
+        mines.add(it / 9 to it % 9)
     }
 }
