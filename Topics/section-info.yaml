@@ -7,3 +7,7 @@ content:
 - The try-catch statement
 - Values and variables
 - Enum
+- Secondary constructor
+- String formatting
+- Repeating blocks
+- Type cast and smart cast
